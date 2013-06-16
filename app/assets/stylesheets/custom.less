@@ -1,0 +1,45 @@
+body {
+    padding-top: 50px;
+    font-family: 'ProximaNovaCondensed', sans-serif;
+}
+
+.bold { font-weight: bold; }
+
+.kt-navbar {
+    background-color: #00bbff;
+
+    a { color: #f8f8f8 !important; }
+
+    li a:hover {
+        background-color: #0084C8;
+    }
+}
+
+.kt-logbar {
+    background-color: #dddddd;
+    min-height: 50px;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+
+    input, select {
+        width: 150px;
+        font-family: 'ProximaNovaSemiBold', sans-serif;
+    }
+
+    input[name=station_id] {
+        width: 85px;
+    }
+
+    input[name=callsign], input[name=exchange] {
+        text-transform: uppercase;
+    }
+}
+
+table#contacts {
+    margin-top: 70px; /* .kt-logbar + 10px padding */
+
+    td {
+        vertical-align: middle;
+    }
+}

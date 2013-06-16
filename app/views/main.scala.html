@@ -2,14 +2,37 @@
 
 <!DOCTYPE html>
 
-<html>
-    <head>
-        <title>@title</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
-    </head>
-    <body>
-        @content
-    </body>
+<html lang="en">
+  <head>
+    <title>@title</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kampo Tago - Field Day Logger">
+    <meta name="author" content="Ricky Elrod">
+
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("bootstrap/css/bootstrap.css")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("font-awesome/css/font-awesome.min.css")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("fonts/proxima-nova/stylesheet.css")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/custom.min.css")">
+
+    <!-- Keep this up here so we can reference it in templates. -->
+    <script src="@routes.Assets.at("js/jquery-2.0.2.min.js")"></script>
+    <script src="@routes.Assets.at("javascripts/filter.min.js")"></script>
+  </head>
+  <body>
+
+    <div class="navbar navbar-fixed-top kt-navbar">
+      <div class="container">
+        <a class="navbar-brand bold" href="/"><span class="icon-microphone"></span> Field Day 2013</a>
+      </div>
+    </div>
+    @content
+    <script src="@routes.Assets.at("bootstrap/js/bootstrap.min.js")"></script>
+    <script>
+      jQuery.expr[':'].Contains = function(a, i, m) {
+        return jQuery(a).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0;
+      };
+    </script>
+  </body>
 </html>
