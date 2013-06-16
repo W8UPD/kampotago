@@ -9,6 +9,8 @@ import play.api.libs.iteratee.{ Concurrent, Enumerator, Iteratee }
 import play.api.libs.json._
 import play.api.Play.current
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+
 import models._
 
 case class WebSocketSubscribe()
@@ -49,10 +51,16 @@ class ContactActor extends Actor with ActorLogging {
       log.info(s"Someone unsubscribed - ${subscriberCount} subscribers.")
     }
     case e: Contact => {
-      val id = e.save()
-      val res = Contact.findByID(id.getOrElse(0))
-      channel.push(Json.toJson(res))
-      log.info(res.toString)
+      try {
+        val id = e.save()
+        val res = Contact.findByID(id.getOrElse(0))
+        channel.push(Json.toJson(res))
+        log.info(res.toString)
+      } catch {
+        case e: MySQLIntegrityConstraintViolationException => {
+          channel.push(Json.toJson(Map("error" -> "DUPE!!!")))
+        }
+      }
     }
     case Delete(id) => {
       val deleteJson = Map("delete" -> id.toString)
