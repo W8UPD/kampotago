@@ -27,15 +27,16 @@ class ContactActor extends Actor with ActorLogging {
     (__ \ "callsign").read[String] and
     (__ \ "exchange").read[String] and
     (__ \ "band").read[String] and
-    (__ \ "mode").read[String]
+    (__ \ "mode").read[String] and
+    (__ \ "uuid").read[String]
   ) tupled
 
   def receive = {
     case WebSocketSubscribe() => {
       val iteratee = Iteratee.foreach[JsValue] { input =>
-        input.validate[(String, String, String, String, String)].map {
-          case (stationID, callsign, exchange, band, mode) => {
-            self ! Contact(None, callsign, exchange, band, mode, stationID.toInt, None)
+        input.validate[(String, String, String, String, String, String)].map {
+          case (stationID, callsign, exchange, band, mode, uuid) => {
+            self ! (Contact(None, callsign, exchange, band, mode, stationID.toInt, None), uuid)
           }
         }.recoverTotal {
           e => println(JsError.toFlatJson(e))
@@ -50,7 +51,7 @@ class ContactActor extends Actor with ActorLogging {
       subscriberCount -= 1
       log.info(s"Someone unsubscribed - ${subscriberCount} subscribers.")
     }
-    case e: Contact => {
+    case (e: Contact, uuid: String) => {
       try {
         val id = e.save()
         val res = Contact.findByID(id.getOrElse(0))
@@ -58,7 +59,8 @@ class ContactActor extends Actor with ActorLogging {
         log.info(res.toString)
       } catch {
         case e: MySQLIntegrityConstraintViolationException => {
-          channel.push(Json.toJson(Map("error" -> "DUPE!!!")))
+          val json = Json.toJson(Map("error" -> "DUPE!!!", "uuid" -> uuid))
+          channel.push(json)
         }
       }
     }

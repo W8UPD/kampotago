@@ -18,6 +18,12 @@
       return o;
   };
 
+  uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+    return v.toString(16);
+  });
+
+
   $(function() {
     ws = new WebSocket("@routes.Application.websocket.webSocketURL()")
     ws.onmessage = function(msg) {
@@ -26,7 +32,11 @@
         // We'll send {"delete": "some id"} if we're triggering a delete.
         $("tr#kt-contact-" + message["delete"]).remove();
       } else if ("error" in message) {
-        alert("ERROR: " + message["error"]);
+        // We don't combine this if in the above one because we never want to
+        // add a row, if there's an error key.
+        if (message["uuid"] === uuid) {
+          alert("ERROR: " + message["error"]);
+        }
       } else {
         // Otherwise we're logging. So add a row!
         $("#contacts tbody").prepend("<tr class='kt-contact-" + message["id"] + "'> \
@@ -42,7 +52,9 @@
     }
 
     var sendMessage = function() {
-      ws.send(JSON.stringify($("#kt-logbar-form").serializeObject()));
+      contact = $("#kt-logbar-form").serializeObject();
+      contact["uuid"] = uuid;
+      ws.send(JSON.stringify(contact));
       $("input[name=callsign]").val('');
       $("input[name=exchange]").val('');
       $("#contacts tr").show();
